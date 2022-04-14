@@ -1,12 +1,13 @@
 //https://trufflesuite.com/docs/truffle/getting-started/interacting-with-your-contracts.html
 //The link above is a good resource for everything related to truffle contracts.
 
-const { web3, assert } = require("hardhat")
-const { VRFCoordniator, LINK, KeyHash, ERC20ABI, UniSwapV3RouterAddress, WETH } = require('../EVMAddresses/evmAddresses')
+const { web3, assert, network, config } = require("hardhat")
+const { VRFCoordniator, LINK, KeyHash, WTOKEN } = config.EVMAddresses[network.name]
+const { ERC20ABI, UniSwapV3RouterAddress } = config.EVMAddresses
 const { wrapToken } = require('../util/TokenUtil')
 const { BigNumber } = require('bignumber.js')
 
-const WETHContract = new web3.eth.Contract(ERC20ABI, WETH)
+const WTokenContract = new web3.eth.Contract(ERC20ABI, WTOKEN)
 const LINKContract = new web3.eth.Contract(ERC20ABI, LINK)
 
 //Creates a truffe contract from compiled artifacts.
@@ -42,27 +43,26 @@ describe("AdvancedCollectible contract", function () {
         assert.equal(await uniSwapSingleSwap.swapRouter(), UniSwapV3RouterAddress)
     })
 
-    it('Should swap token values WETH for LINK', async function () {
-        let wethAmountToTransfer = 15
-        //Send ETH to WETH contract in return for WETH
-        await wrapToken(wethAmountToTransfer, accounts[0], WETHContract)
-        //Sends WETH to the deployed contract and
+    it('Should swap token values WTOKEN for LINK', async function () {
+        let wTokenAmountToTransfer = 15
+        //Send ETH to WTOKEN contract in return for WTOKEN
+        await wrapToken(wTokenAmountToTransfer, accounts[0], WTokenContract)
+        //Sends WTOKEN to the deployed contract and
         //checks the results.
 
-        //await sendWrapEth(wethAmountToTransfer,uniSwapSingleSwap.address, accounts[0])
-        //let contractWethBal = await WETHContract.methods.balanceOf(uniSwapSingleSwap.address).call()
-        //assert.equal(web3.utils.fromWei(contractWethBal,'ether'),wethAmountToTransfer)
+        //await sendWrapEth(wTokenAmountToTransfer,uniSwapSingleSwap.address, accounts[0])
+        //let contractWethBal = await WTokenContract.methods.balanceOf(uniSwapSingleSwap.address).call()
+        //assert.equal(web3.utils.fromWei(contractWethBal,'ether'),wTokenAmountToTransfer)
 
-        await WETHContract.methods.approve(uniSwapSingleSwap.address, web3.utils.toWei(wethAmountToTransfer.toString(), 'ether')).send({ from: accounts[0] })
+        await WTokenContract.methods.approve(uniSwapSingleSwap.address, web3.utils.toWei(wTokenAmountToTransfer.toString(), 'ether')).send({ from: accounts[0] })
 
         //The link at the top of this file describes how to override 
         //the from value when dealing with transactions using truffle contracts.
-        //I am sending the wethAmountToTransfer to the contract to be swapped on
+        //I am sending the wTokenAmountToTransfer to the contract to be swapped on
         //UniSwap V3 Pool for LINK. The LINK is then transferred back to the account
         //that sent the request.
-        await uniSwapSingleSwap.swapExactInputSingle(web3.utils.toWei(wethAmountToTransfer.toString(), 'ether'), 0, WETH, LINK, 500, { from: accounts[0] })
+        await uniSwapSingleSwap.swapExactInputSingle(web3.utils.toWei(wTokenAmountToTransfer.toString(), 'ether'), 0, WTOKEN, LINK, 3000, { from: accounts[0] })
         LINKBal = await LINKContract.methods.balanceOf(accounts[0]).call()
-        console.log(LINKBal)
         assert.notEqual(LINKBal / 10 ** 8, 0)
     })
 

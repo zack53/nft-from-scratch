@@ -1,5 +1,5 @@
-const { ethers, web3 } = require("hardhat")
-const { VRFCoordniator, LINK, KeyHash } = require('../EVMAddresses/evmAddresses')
+const { ethers, web3, network, config } = require("hardhat")
+const { VRFCoordniator, LINK, KeyHash } = config.EVMAddresses[network.name]
 
 /**
  * Script to deploy contracts using hardhat
