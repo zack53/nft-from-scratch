@@ -26,10 +26,11 @@ contract AdvancedCollectible is VRFConsumerBase, ERC721URIStorage {
     constructor(
         address _VRFCoordinator,
         address _LinkToken,
-        bytes32 _keyhash
+        bytes32 _keyhash,
+        uint256 _fee
     ) ERC721("Doggies", "DOG") VRFConsumerBase(_VRFCoordinator, _LinkToken) {
         keyHash = _keyhash;
-        fee = .25 * 10**18;
+        fee = _fee;
     }
 
     function CreateDoggies(string memory tokenURI) public returns (bytes32) {

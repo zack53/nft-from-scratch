@@ -2,7 +2,7 @@
 //The link above is a good resource for everything related to truffle contracts.
 
 const { web3, assert, network, config } = require("hardhat")
-const { VRFCoordniator, LINK, KeyHash, WTOKEN } = config.EVMAddresses[network.name]
+const { VRFCoordniator, LINK, KeyHash, WTOKEN, fee } = config.EVMAddresses[network.name]
 const { ERC20ABI, UniSwapV3RouterAddress } = config.EVMAddresses
 const { wrapToken } = require('../util/TokenUtil')
 const { BigNumber } = require('bignumber.js')
@@ -26,7 +26,7 @@ describe("AdvancedCollectible contract", function () {
         let balance = await web3.eth.getBalance(accounts[0])
         assert.notEqual(balance, 0)
         //deploy contract
-        advancedCollectible = await AdvancedCollectible.new(VRFCoordniator, LINK, KeyHash)
+        advancedCollectible = await AdvancedCollectible.new(VRFCoordniator, LINK, KeyHash, fee)
         //deploy contract
         uniSwapSingleSwap = await UniSwapSingleSwap.new(UniSwapV3RouterAddress)
     })
