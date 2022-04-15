@@ -8,7 +8,6 @@ logs
 examples/*
 examples
 cache/
-hardhat.config.js
 FlashLoanTest.js
 GetTokenInfoFromContract.js
 next.config.js
