@@ -7,9 +7,11 @@ const { sleep } = require('../util/TokenUtil')
 
 let main = async () => {
 
-
+    // Sets the contract to the deployed address
     const AdvancedCollectible = await ethers.getContractFactory("AdvancedCollectible")
     const advancedCollectible = AdvancedCollectible.attach(AdvancedCollectibleAddress)
+
+    // Starts the process to create a dog NFT
     console.log('Creating doggie')
     await advancedCollectible.CreateDoggies('')
 
@@ -18,8 +20,8 @@ let main = async () => {
 
     let blockNumberStart = BigNumber(await web3.eth.getBlockNumber()).minus(50).toNumber()
 
+    // Parse the event info to set the token URI
     let event = await advancedCollectible.queryFilter("requestedCollectible", blockNumberStart, 'latest')
-
     for (let i = 0; i < event.length; i++) {
         let requestId = event[i].args[1]
         let tokenId = (await advancedCollectible.requestIdToTokenId(requestId)).toString()

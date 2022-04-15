@@ -7,8 +7,14 @@ const { ERC20ABI } = config.EVMAddresses
 const LINKContract = new web3.eth.Contract(ERC20ABI, LINK)
 
 
+/**
+ * Funds the deployed contract with Link
+ */
 let main = async () => {
+    // Get accounts
     const accounts = await web3.eth.getAccounts()
+
+    // Set contract 
     const AdvancedCollectible = await ethers.getContractFactory("AdvancedCollectible")
     const advancedCollectible = AdvancedCollectible.attach(AdvancedCollectibleAddress)
 
