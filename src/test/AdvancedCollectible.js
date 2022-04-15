@@ -6,6 +6,7 @@ const { VRFCoordniator, LINK, KeyHash, WTOKEN, fee } = config.EVMAddresses[netwo
 const { ERC20ABI, UniSwapV3RouterAddress } = config.EVMAddresses
 const { wrapToken } = require('../util/TokenUtil')
 const { BigNumber } = require('bignumber.js')
+const { sleep } = require('../util/TokenUtil')
 
 const WTokenContract = new web3.eth.Contract(ERC20ABI, WTOKEN)
 const LINKContract = new web3.eth.Contract(ERC20ABI, LINK)
@@ -19,6 +20,7 @@ describe("AdvancedCollectible contract", function () {
     let accounts
     let advancedCollectible
     let LINKBal
+    let requestId
 
     before(async function () {
         accounts = await web3.eth.getAccounts()
@@ -74,18 +76,33 @@ describe("AdvancedCollectible contract", function () {
     })
 
     it("Should mint NFT", async function () {
+        let amountCreated = await advancedCollectible.tokenCounter()
         await advancedCollectible.CreateDoggies('')
         let event = await advancedCollectible.getPastEvents('requestedCollectible', { fromBlock: BigNumber(await web3.eth.getBlockNumber()).minus(1).toString(), toBlock: 'latest' })
+
+        for (let i = 0; i < event.length; i++) {
+            if (event[i].returnValues.minter == accounts[0]) {
+                requestId = event[i].returnValues.requestId
+                break
+            }
+        }
+        assert.notEqual(requestId.toString(), 0x0)
+        // Sleep until the link process can generate / confirm random number
+        // then, the fulfillRandomness is called by link process that is
+        // responsible for generating random Doggie.
+        await sleep(1000 * 30)
+    })
+
+    it("Should wait another 20 seconds then set token URI", async () => {
+        await sleep(1000 * 20)
+
+        let event = await advancedCollectible.getPastEvents('mintCollectible', { fromBlock: BigNumber(await web3.eth.getBlockNumber()).minus(1).toString(), toBlock: 'latest' })
         console.log(event)
-        // let id = 0
-        // let amountCreated = await advancedCollectible.CryptNFTsAmountCreated()
-        // for (let i = 0; i < event.length; i++) {
-        //     if (event[i].returnValues.minter == accounts[0]) {
-        //         id = event[i].returnValues.id
-        //         break
-        //     }
-        // }
-        // assert.equal(id.toString(), amountCreated.toString())
+        let tokenId = (await advancedCollectible.requestIdToTokenId(requestId)).toString()
+        console.log(tokenId)
+        let breed = (await advancedCollectible.tokenIdToBreed(tokenId)).toString()
+        console.log(breed)
+        console.log(config.IPFSTokenURI[breed])
     })
 
     // it("Should mint NFT", async function () {

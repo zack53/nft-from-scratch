@@ -21,7 +21,16 @@ contract AdvancedCollectible is VRFConsumerBase, ERC721URIStorage {
     mapping(uint256 => Breed) public tokenIdToBreed;
     mapping(bytes32 => uint256) public requestIdToTokenId;
 
-    event requestedCollectible(bytes32 indexed requestId);
+    event requestedCollectible(
+        address indexed minter,
+        bytes32 indexed requestId
+    );
+
+    event mintCollectible(
+        bytes32 indexed requestId,
+        uint256 tokenId,
+        Breed breed
+    );
 
     constructor(
         address _VRFCoordinator,
@@ -37,7 +46,7 @@ contract AdvancedCollectible is VRFConsumerBase, ERC721URIStorage {
         bytes32 requestId = requestRandomness(keyHash, fee);
         requestIdToSender[requestId] = msg.sender;
         requestIdToTokenURI[requestId] = tokenURI;
-        emit requestedCollectible(requestId);
+        emit requestedCollectible(msg.sender, requestId);
         return requestId;
     }
 
@@ -55,6 +64,8 @@ contract AdvancedCollectible is VRFConsumerBase, ERC721URIStorage {
         Breed breed = Breed(randomness % 3);
         tokenIdToBreed[tokenCounter] = breed;
         requestIdToTokenId[requestId] = tokenCounter;
+
+        emit mintCollectible(requestId, tokenCounter, breed);
 
         tokenCounter += 1;
     }

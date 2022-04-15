@@ -10,10 +10,10 @@ module.exports = {
      * @param {*} price2 
      * @returns 
      */
-    getPercentDifference: (price,price2) => {
+    getPercentDifference: (price, price2) => {
         let higherPrice = (price >= price2) ? price : price2
         let lowerPrice = (price < price2) ? price : price2
-        return 100-(lowerPrice/higherPrice)*100
+        return 100 - (lowerPrice / higherPrice) * 100
     },
 
     /**
@@ -23,12 +23,12 @@ module.exports = {
      * @param {*} sushiSwapPrice 
      * @returns 
      */
-    getTokenDirection: (uniSwapPrice,sushiSwapPrice, isReversed) => {
+    getTokenDirection: (uniSwapPrice, sushiSwapPrice, isReversed) => {
         let direction = ''
         //Assuming uniswap is first price
-        if(isReversed){
+        if (isReversed) {
             direction = (uniSwapPrice < sushiSwapPrice) ? 1 : 0
-        }else{
+        } else {
             direction = (uniSwapPrice >= sushiSwapPrice) ? 1 : 0
         }
         return direction
@@ -41,7 +41,7 @@ module.exports = {
      * @param {*} tokenContract 
      */
     wrapToken: async (amount, _from, tokenContract) => {
-        await tokenContract.methods.deposit().send({from: _from, value: web3.utils.toWei(amount.toString(), 'ether')})
+        await tokenContract.methods.deposit().send({ from: _from, value: web3.utils.toWei(amount.toString(), 'ether') })
     },
 
     /**
@@ -54,8 +54,8 @@ module.exports = {
      * @param {*} fromAccount 
      * @param {*} tokenContract 
      */
-    sendToken: async(amount, to, fromAccount, tokenContract) => {
-        await tokenContract.methods.transfer(to,web3.utils.toWei(amount.toString(), 'ether')).send({from: fromAccount})
+    sendToken: async (amount, to, fromAccount, tokenContract) => {
+        await tokenContract.methods.transfer(to, web3.utils.toWei(amount.toString(), 'ether')).send({ from: fromAccount })
     },
 
     /**
@@ -80,6 +80,13 @@ module.exports = {
         // documentation can be found https://docs.polygon.technology/docs/develop/tools/polygon-gas-station
         // acceptable speeds are: safeLow, standard, fast
         let results = await axios.get('https://gasstation-mainnet.matic.network/v2')
-        return Web3.utils.toWei(results.data[speed].maxPriorityFee.toFixed(9),'gwei')
+        return Web3.utils.toWei(results.data[speed].maxPriorityFee.toFixed(9), 'gwei')
+    },
+
+    sleep: (ms) => {
+        return new Promise((resolve) => {
+            setTimeout(resolve, ms);
+        });
     }
+
 }
